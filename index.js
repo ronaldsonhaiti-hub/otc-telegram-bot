@@ -24,16 +24,12 @@ bot.on("error", (err) => console.log("❌ bot_error:", err?.message || err));
 
 // ================== OPTIONAL: Reply to test ==================
 bot.on("message", (msg) => {
-  // Répond juste "OK" si tu écris au bot en privé (ça confirme que le token marche)
   if (msg.chat && msg.chat.type === "private") {
     bot.sendMessage(msg.chat.id, "✅ OK (token/polling fonctionne)");
   }
 });
 
 // ================== SESSIONS (UTC) ==================
-// Asia (Tokyo) ~ 00:00 - 09:00 UTC
-// London ~ 07:00 - 16:00 UTC
-// US (NY) ~ 13:00 - 22:00 UTC
 function isInTradingSessionUTC(date = new Date()) {
   const h = date.getUTCHours();
   const m = date.getUTCMinutes();
@@ -47,7 +43,7 @@ function isInTradingSessionUTC(date = new Date()) {
 }
 
 // ================== SIGNAL CONFIG ==================
-const PAIRS = ["GBPUSD OTC", "AUDUSD OTC", "CADUSD OTC"];
+const PAIRS = ["GBPUSD OTC", "AUDUSD OTC", "CADJPY OTC"]; // ✅ ici
 let pairIndex = 0;
 
 // Toutes les 3 minutes
@@ -57,7 +53,7 @@ const INTERVAL_MS = 3 * 60 * 1000;
 let lastBootMsgAt = 0;
 function sendBootMessage() {
   const now = Date.now();
-  if (now - lastBootMsgAt < 10 * 60 * 1000) return; // 10 minutes
+  if (now - lastBootMsgAt < 10 * 60 * 1000) return;
   lastBootMsgAt = now;
 
   bot.sendMessage(CHAT_ID, "✅ Bot démarré sur Render (Worker OK)").catch((e) => {
@@ -85,11 +81,10 @@ function buildSignalMessage(pair) {
 🕒 Heure (UTC) : ${nowUTC}`;
 }
 
-// Anti-spam envoi (évite trop de messages)
+// Anti-spam envoi
 let lastSentAt = 0;
 function canSendNow() {
   const now = Date.now();
-  // minimum 60 secondes entre messages
   if (now - lastSentAt < 60 * 1000) return false;
   lastSentAt = now;
   return true;
@@ -97,17 +92,12 @@ function canSendNow() {
 
 async function tick() {
   try {
-    // 1) session filter
     if (!isInTradingSessionUTC(new Date())) return;
-
-    // 2) anti-spam
     if (!canSendNow()) return;
 
-    // 3) pick pair
     const pair = PAIRS[pairIndex % PAIRS.length];
     pairIndex++;
 
-    // 4) send message
     const msg = buildSignalMessage(pair);
     await bot.sendMessage(CHAT_ID, msg);
     console.log("✅ Signal envoyé:", pair);
@@ -116,7 +106,6 @@ async function tick() {
   }
 }
 
-// Lance immédiatement, puis toutes les 3 minutes
 tick();
 setInterval(tick, INTERVAL_MS);
 
