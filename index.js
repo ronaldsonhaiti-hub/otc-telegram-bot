@@ -50,8 +50,7 @@ function isInTradingSessionUTC(date = new Date()) {
 }
 
 // ============ SIGNAL ENGINE (DEMO) ============
-const PAIRS = ["GBPUSD OTC", "AUDUSD OTC", "CADUSD OTC"];
-let pairIndex = 0;
+const PAIRS = ["GBPUSD OTC", "AUDUSD OTC", "CADJPY OTC"];
 
 // anti-spam: garde la dernière minute d’envoi
 let lastSentAt = 0;
