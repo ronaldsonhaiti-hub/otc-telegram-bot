@@ -36,3 +36,28 @@ bot.on("channel_post", (msg) => {
 // Endpoint Render
 app.get("/", (req, res) => res.send("OTC Telegram Bot is running ✅"));
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// 🔥 SIGNAL TEST AUTO (une seule fois)
+function sendSignal() {
+  const CHAT_ID = process.env.CHAT_ID;
+
+  if (!CHAT_ID) {
+    console.log("❌ CHAT_ID manquant");
+    return;
+  }
+
+  const message = `
+🔥 SIGNAL OTC M1
+
+💱 Actif : GBPUSD OTC
+📈 Direction : PUT
+⏱ Expiration : 1 minute
+🎯 Setup : Pullback EMA 50
+
+🕒 Heure : ${new Date().toUTCString()}
+`;
+
+  bot.sendMessage(CHAT_ID, message);
+}
+
+// ⏱ envoi 10 secondes après le démarrage
+setTimeout(sendSignal, 10000);
